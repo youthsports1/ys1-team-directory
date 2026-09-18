@@ -37,15 +37,26 @@ body {
   background: #1d1d1d;
   border-top: 4px solid #55e7f4;
   border-radius: 10px;
-  padding: 25px 18px;
+  overflow: hidden;
   text-align: center;
-  min-height: 230px;
+  min-height: 350px;
+}
+
+.team-logo {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.team-info {
+  padding: 18px;
 }
 
 .team-card h2 {
   color: #55e7f4;
   font-size: 21px;
-  margin: 0 0 15px;
+  margin: 0 0 12px;
 }
 
 .team-card p {
@@ -95,6 +106,19 @@ body {
 
 const sheetURL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqzTH1FxtERL_H4OC9trts5bdXCHDtK3k4BRlI_oR20Xcsv78ychhbPPTrShFd_UsIey_zC7bL1Jk-/pub?gid=372911082&single=true&output=csv";
+
+const placeholders = [
+  "images/baseball-placeholder.png",
+  "images/baseball-placeholder-2.png",
+  "images/baseball-placeholder-3.png",
+  "images/baseball-placeholder-4.png",
+  "images/baseball-placeholder-5.png",
+  "images/baseball-placeholder-6.png",
+  "images/baseball-placeholder-7.png",
+  "images/baseball-placeholder-8.png",
+  "images/baseball-placeholder-9.png",
+  "images/baseball-placeholder-10.png"
+];
 
 function parseCSV(text) {
   const rows = [];
@@ -152,7 +176,7 @@ fetch(sheetURL)
     const grid = document.getElementById("team-grid");
     const status = document.getElementById("status");
 
-    teams.forEach(row => {
+    teams.forEach((row, index) => {
 
       const team = row[0] || "";
       const town = row[1] || "";
@@ -164,34 +188,46 @@ fetch(sheetURL)
 
       if (!team.trim()) return;
 
+      const placeholder =
+        placeholders[index % placeholders.length];
+
       const card = document.createElement("div");
       card.className = "team-card";
-      
-      const img = document.createElement('img');
-      img.src = logo || "images/baseball-placeholder.png";
-      img.className = "team - logo";
+
+      const img = document.createElement("img");
+      img.src = logo.trim() || placeholder;
+      img.className = "team-logo";
+      img.alt = team + " logo";
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = placeholder;
+      };
+
       card.appendChild(img);
-      img.onerror = () => { img.src = "images/baseball-placeholder.png"; };
+
+      const info = document.createElement("div");
+      info.className = "team-info";
+
       const name = document.createElement("h2");
       name.textContent = team;
-      card.appendChild(name);
+      info.appendChild(name);
 
       if (town) {
         const p = document.createElement("p");
         p.textContent = town;
-        card.appendChild(p);
+        info.appendChild(p);
       }
 
       if (ages) {
         const p = document.createElement("p");
         p.textContent = ages;
-        card.appendChild(p);
+        info.appendChild(p);
       }
 
       if (type) {
         const p = document.createElement("p");
         p.textContent = type;
-        card.appendChild(p);
+        info.appendChild(p);
       }
 
       let link = website;
@@ -206,10 +242,13 @@ fetch(sheetURL)
         button.href = link;
         button.target = "_blank";
         button.rel = "noopener noreferrer";
-        button.textContent = website ? "Visit Website" : "Visit Team Page";
-        card.appendChild(button);
+        button.textContent =
+          website ? "Visit Website" : "Visit Team Page";
+
+        info.appendChild(button);
       }
 
+      card.appendChild(info);
       grid.appendChild(card);
     });
 
