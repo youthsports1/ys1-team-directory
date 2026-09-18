@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>YS1 Ocean County Team Directory</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 25px;
+  background: #111111;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+#status {
+  text-align: center;
+  padding: 30px;
+  font-size: 18px;
+}
+
+#team-grid {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.team-card {
+  background: #1d1d1d;
+  border-top: 4px solid #55e7f4;
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.team-logo {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.team-info {
+  padding: 18px;
+  flex: 1;
+}
+
+.team-card h2 {
+  color: #55e7f4;
+  font-size: 21px;
+  margin: 0 0 12px;
+}
+
+.team-card p {
+  margin: 7px 0;
+  font-size: 15px;
+}
+
+.visit-button {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 18px;
+  background: #ff1493;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.visit-button:hover {
+  opacity: .85;
+}
+
+@media (max-width: 800px) {
+  #team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  body {
+    padding: 12px;
+  }
+
+  #team-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="status">Loading Ocean County teams...</div>
+<div id="team-grid"></div>
+
+<script>
+
+const sheetURL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTqzTH1FxtERL_H4OC9trts5bdXCHDtK3k4BRlI_oR20Xcsv78ychhbPPTrShFd_UsIey_zC7bL1Jk-/pub?gid=195075999&single=true&output=csv";
+
+const placeholders = [
+  "images/baseball-placeholder.png",
+  "images/baseball-placeholder-2.png",
+  "images/baseball-placeholder-3.png",
+  "images/baseball-placeholder-4.png",
+  "images/baseball-placeholder-5.png",
+  "images/baseball-placeholder-6.png",
+  "images/baseball-placeholder-7.png",
+  "images/baseball-placeholder-8.png",
+  "images/baseball-placeholder-9.png",
+  "images/baseball-placeholder-10.png"
+];
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      i++;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(cell);
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") i++;
+
+      row.push(cell);
+
+      if (row.some(value => value.trim() !== "")) {
+        rows.push(row);
+      }
+
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+
+  if (cell.length || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+function isURL(value) {
+  return /^https?:\/\//i.test((value || "").trim());
+}
+
+fetch(sheetURL)
+  .then(response => {
+    if (!response.ok) throw new Error("Could not load database.");
+    return response.text();
+  })
+
+  .then(text => {
+
+    const rows = parseCSV(text);
+    const teams = rows.slice(1);
+
+    const grid = document.getElementById("team-grid");
+    const status = document.getElementById("status");
+
+    teams.forEach((row, index) => {
+
+      const team = row[0] || "";
+      const town = row[1] || "";
+      const type = row[2] || "";
+      const ages = row[3] || "";
+      const website = row[4] || "";
+      const social = row[5] || "";
+      const logo = row[6] || "";
+
+      if (!team.trim()) return;
+
+      const placeholder =
+        placeholders[index % placeholders.length];
+
+      const card = document.createElement("div");
+      card.className = "team-card";
+
+      const img = document.createElement("img");
+      img.src = isURL(logo) ? logo.trim() : placeholder;
+      img.className = "team-logo";
+      img.alt = team + " logo";
+
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = placeholder;
+      };
+
+      card.appendChild(img);
+
+      const info = document.createElement("div");
+      info.className = "team-info";
+
+      const name = document.createElement("h2");
+      name.textContent = team;
+      info.appendChild(name);
+
+      if (town) {
+        const p = document.createElement("p");
+        p.textContent = town;
+        info.appendChild(p);
+      }
+
+      if (ages) {
+        const p = document.createElement("p");
+        p.textContent = ages;
+        info.appendChild(p);
+      }
+
+      if (type) {
+        const p = document.createElement("p");
+        p.textContent = type;
+        info.appendChild(p);
+      }
+
+      let link = "";
+
+      if (isURL(website)) {
+        link = website.trim();
+      } else if (isURL(social)) {
+        link = social.trim();
+      }
+
+      if (link) {
+        const button = document.createElement("a");
+        button.className = "visit-button";
+        button.href = link;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+        button.textContent =
+          isURL(website) ? "Visit Website" : "Visit Team Page";
+
+        info.appendChild(button);
+      }
+
+      card.appendChild(info);
+      grid.appendChild(card);
+    });
+
+    status.style.display = "none";
+
+  })
+
+  .catch(error => {
+    document.getElementById("status").textContent =
+      "Unable to load Ocean County team directory.";
+    console.error(error);
+  });
+
+</script>
+
+</body>
+</html>
+Message 2 of 2. For JAWS, turn virtual PC Cursor on if needed.
+
+dlk22@yahoo.com
+To:  me
+ · 
+Fri, Sep 18 at 9:30 AM
+Message Body
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>YS1 Ocean County Team Directory</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 25px;
+  background: #111111;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+#status {
+  text-align: center;
+  padding: 30px;
+  font-size: 18px;
+}
+
+#team-grid {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.team-card {
+  background: #1d1d1d;
+  border-top: 4px solid #55e7f4;
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.team-logo {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.team-info {
+  padding: 18px;
+  flex: 1;
+}
+
+.team-card h2 {
+  color: #55e7f4;
+  font-size: 21px;
+  margin: 0 0 12px;
+}
+
+.team-card p {
+  margin: 7px 0;
+  font-size: 15px;
+}
+
+.visit-button {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 18px;
+  background: #ff1493;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.visit-button:hover {
+  opacity: .85;
+}
+
+@media (max-width: 800px) {
+  #team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  body {
+    padding: 12px;
+  }
+
+  #team-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="status">Loading Ocean County teams...</div>
+<div id="team-grid"></div>
+
+<script>
+
+const sheetURL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTqzTH1FxtERL_H4OC9trts5bdXCHDtK3k4BRlI_oR20Xcsv78ychhbPPTrShFd_UsIey_zC7bL1Jk-/pub?gid=195075999&single=true&output=csv";
+
+const placeholders = [
+  "images/baseball-placeholder.png",
+  "images/baseball-placeholder-2.png",
+  "images/baseball-placeholder-3.png",
+  "images/baseball-placeholder-4.png",
+  "images/baseball-placeholder-5.png",
+  "images/baseball-placeholder-6.png",
+  "images/baseball-placeholder-7.png",
+  "images/baseball-placeholder-8.png",
+  "images/baseball-placeholder-9.png",
+  "images/baseball-placeholder-10.png"
+];
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      i++;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(cell);
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") i++;
+
+      row.push(cell);
+
+      if (row.some(value => value.trim() !== "")) {
+        rows.push(row);
+      }
+
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+
+  if (cell.length || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+function isURL(value) {
+  return /^https?:\/\//i.test((value || "").trim());
+}
+
+fetch(sheetURL)
+  .then(response => {
+    if (!response.ok) throw new Error("Could not load database.");
+    return response.text();
+  })
+
+  .then(text => {
+
+    const rows = parseCSV(text);
+    const teams = rows.slice(1);
+
+    const grid = document.getElementById("team-grid");
+    const status = document.getElementById("status");
+
+    teams.forEach((row, index) => {
+
+      const team = row[0] || "";
+      const town = row[1] || "";
+      const type = row[2] || "";
+      const ages = row[3] || "";
+      const website = row[4] || "";
+      const social = row[5] || "";
+      const logo = row[6] || "";
+
+      if (!team.trim()) return;
+
+      const placeholder =
+        placeholders[index % placeholders.length];
+
+      const card = document.createElement("div");
+      card.className = "team-card";
+
+      const img = document.createElement("img");
+      img.src = isURL(logo) ? logo.trim() : placeholder;
+      img.className = "team-logo";
+      img.alt = team + " logo";
+
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = placeholder;
+      };
+
+      card.appendChild(img);
+
+      const info = document.createElement("div");
+      info.className = "team-info";
+
+      const name = document.createElement("h2");
+      name.textContent = team;
+      info.appendChild(name);
+
+      if (town) {
+        const p = document.createElement("p");
+        p.textContent = town;
+        info.appendChild(p);
+      }
+
+      if (ages) {
+        const p = document.createElement("p");
+        p.textContent = ages;
+        info.appendChild(p);
+      }
+
+      if (type) {
+        const p = document.createElement("p");
+        p.textContent = type;
+        info.appendChild(p);
+      }
+
+      let link = "";
+
+      if (isURL(website)) {
+        link = website.trim();
+      } else if (isURL(social)) {
+        link = social.trim();
+      }
+
+      if (link) {
+        const button = document.createElement("a");
+        button.className = "visit-button";
+        button.href = link;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+        button.textContent =
+          isURL(website) ? "Visit Website" : "Visit Team Page";
+
+        info.appendChild(button);
+      }
+
+      card.appendChild(info);
+      grid.appendChild(card);
+    });
+
+    status.style.display = "none";
+
+  })
+
+  .catch(error => {
+    document.getElementById("status").textContent =
+      "Unable to load Ocean County team directory.";
+    console.error(error);
+  });
+
+</script>
+
+</body>
+</html>
