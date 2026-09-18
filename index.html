@@ -39,7 +39,8 @@ body {
   border-radius: 10px;
   overflow: hidden;
   text-align: center;
-  min-height: 350px;
+  display: flex;
+  flex-direction: column;
 }
 
 .team-logo {
@@ -51,6 +52,7 @@ body {
 
 .team-info {
   padding: 18px;
+  flex: 1;
 }
 
 .team-card h2 {
@@ -162,6 +164,10 @@ function parseCSV(text) {
   return rows;
 }
 
+function isURL(value) {
+  return /^https?:\/\//i.test((value || "").trim());
+}
+
 fetch(sheetURL)
   .then(response => {
     if (!response.ok) throw new Error("Could not load database.");
@@ -195,9 +201,10 @@ fetch(sheetURL)
       card.className = "team-card";
 
       const img = document.createElement("img");
-      img.src = logo.trim() || placeholder;
+      img.src = isURL(logo) ? logo.trim() : placeholder;
       img.className = "team-logo";
       img.alt = team + " logo";
+
       img.onerror = () => {
         img.onerror = null;
         img.src = placeholder;
@@ -230,10 +237,12 @@ fetch(sheetURL)
         info.appendChild(p);
       }
 
-      let link = website;
+      let link = "";
 
-      if (!link && social.startsWith("http")) {
-        link = social;
+      if (isURL(website)) {
+        link = website.trim();
+      } else if (isURL(social)) {
+        link = social.trim();
       }
 
       if (link) {
@@ -243,7 +252,7 @@ fetch(sheetURL)
         button.target = "_blank";
         button.rel = "noopener noreferrer";
         button.textContent =
-          website ? "Visit Website" : "Visit Team Page";
+          isURL(website) ? "Visit Website" : "Visit Team Page";
 
         info.appendChild(button);
       }
