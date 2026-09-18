@@ -160,12 +160,18 @@ fetch(sheetURL)
       const ages = row[3] || "";
       const website = row[4] || "";
       const social = row[5] || "";
+      const logo = row[6] || "";
 
       if (!team.trim()) return;
 
       const card = document.createElement("div");
       card.className = "team-card";
-
+      
+      const img = document.createElement('img');
+      img.src = logo || "images/baseball-placeholder.png";
+      img.className = "team - logo";
+      card.appendChild(img);
+      img.onerror = () => { img.src = "images/baseball-placeholder.png"; };
       const name = document.createElement("h2");
       name.textContent = team;
       card.appendChild(name);
