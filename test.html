@@ -306,6 +306,8 @@ fetch(sheetURL)
       const website = row[4] || "";
       const social = row[5] || "";
       const logo = row[12] || "";
+     const cardBackground = row[13] || "";
+     
 
       if (!team.trim()) return;
 
@@ -316,7 +318,7 @@ fetch(sheetURL)
 card.className = "team-card";
 
 const img = document.createElement("img");
-img.src = isURL(logo) ? logo.trim() : placeholder;
+img.src = cardBackground.trim() || placeholder;
 img.className = "team-logo";
 img.alt = team + " background";
 
