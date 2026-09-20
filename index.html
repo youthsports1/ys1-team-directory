@@ -74,6 +74,17 @@ body {
   border-radius: 8px;
 }
 
+ .team-logo-overlay {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    z-index: 5;
+}
+
+
 /* DARK GRADIENT OVER LOWER PHOTO */
 .team-card::after {
   content: "";
@@ -315,6 +326,16 @@ img.onerror = () => {
 };
 
 card.appendChild(img);
+
+     /* TEAM LOGO */
+if (logo) {
+  const logoImg = document.createElement("img");
+  logoImg.className = "team-logo-overlay";
+  logoImg.src = logo.trim();
+  logoImg.alt = team + " logo";
+  card.appendChild(logoImg);
+}
+     
 card.classList.add("baseball-card");
 
 /* TEAM INFORMATION ON TOP OF THE PHOTO */
