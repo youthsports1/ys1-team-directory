@@ -117,6 +117,17 @@ body {
     0 0 8px #000;
 }
 
+/* CYAN LINE DIRECTLY BELOW TEAM NAME */
+.team-card h2::after {
+  content: "";
+  display: block;
+  width: 82%;
+  height: 3px;
+  margin: 8px auto 10px;
+  background: #55e7f4;
+  box-shadow: 0 0 6px #55e7f4;
+}
+
 /* TOWN / AGES / TEAM TYPE */
 .team-card p {
   color: white;
@@ -127,17 +138,6 @@ body {
   text-shadow:
     0 2px 4px #000,
     0 0 6px #000;
-}
-
-/* CYAN DIVIDER LIKE THE LIT CARD */
-.team-info::before {
-  content: "";
-  display: block;
-  width: 82%;
-  height: 3px;
-  margin: 0 auto 13px;
-  background: #55e7f4;
-  box-shadow: 0 0 6px #55e7f4;
 }
 
 /* BUTTON WRAPPER - OUTSIDE/BENEATH CARD */
@@ -329,7 +329,7 @@ info.appendChild(name);
 /* TOWN */
 if (town) {
   const p = document.createElement("p");
-  p.textContent = town;
+  p.textContent = town +", New Jersey";
   info.appendChild(p);
 }
 
