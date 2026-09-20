@@ -34,21 +34,36 @@ body {
   gap: 24px;
 }
 
-/* EACH TEAM */
+
+ /* ==============================
+   YS1 BASEBALL CARD DIRECTORY
+   ============================== */
+
+#team-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 30px 22px;
+  align-items: start;
+}
+
+/* ENTIRE TEAM ENTRY */
 .team-card {
   position: relative;
   width: 100%;
   aspect-ratio: 3 / 4;
-  border: 3px solid #55e7f4;
+  border: 4px solid #55e7f4;
   border-radius: 12px;
-  overflow: hidden;
   background: #071426;
   box-shadow:
-    0 0 8px rgba(85,231,244,.55),
-    inset 0 0 0 3px #ff1493;
+    0 0 9px rgba(85,231,244,.70),
+    inset 0 0 0 2px #ff1493;
+  overflow: visible;
+  margin-bottom: 70px;
 }
 
-/* BASEBALL PHOTO FILLS THE CARD */
+/* BASEBALL PHOTO */
 .team-logo {
   position: absolute;
   inset: 0;
@@ -56,102 +71,104 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 8px;
 }
 
-/* DARK FADE SO WORDS ARE READABLE */
+/* DARK GRADIENT OVER LOWER PHOTO */
 .team-card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(7,20,38,.15) 0%,
-      rgba(7,20,38,.05) 35%,
-      rgba(7,20,38,.25) 55%,
-      rgba(7,20,38,.95) 78%,
-      #071426 100%
-    );
+  border-radius: 8px;
+  background: linear-gradient(
+    to bottom,
+    rgba(7,20,38,0) 0%,
+    rgba(7,20,38,0) 45%,
+    rgba(7,20,38,.25) 58%,
+    rgba(7,20,38,.90) 78%,
+    #071426 100%
+  );
   pointer-events: none;
+  z-index: 1;
 }
 
-/* TEAM INFORMATION SITS ON THE CARD */
+/* TEAM INFORMATION ON THE CARD */
 .team-info {
   position: absolute;
-  inset: 0;
-  z-index: 2;
-  padding: 18px;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
+  left: 18px;
+  right: 18px;
+  bottom: 22px;
+  z-index: 3;
   text-align: center;
+  color: white;
 }
 
 /* TEAM NAME */
 .team-card h2 {
   color: white;
-  font-size: 26px;
+  font-size: 27px;
   line-height: 1.05;
-  margin: 0 0 10px;
+  margin: 0 0 13px;
   text-transform: uppercase;
   font-weight: 900;
-  text-shadow: 0 2px 5px #000;
+  letter-spacing: .5px;
+  text-shadow:
+    0 2px 4px #000,
+    0 0 8px #000;
 }
 
-/* LOCATION / AGES / TYPE */
+/* TOWN / AGES / TEAM TYPE */
 .team-card p {
   color: white;
-  margin: 3px 0;
+  margin: 4px 0;
   font-size: 16px;
-  line-height: 1.2;
+  line-height: 1.15;
   font-weight: 800;
-  text-shadow: 0 2px 5px #000;
+  text-shadow:
+    0 2px 4px #000,
+    0 0 6px #000;
 }
 
-/* CYAN LINE ABOVE TEAM DETAILS */
+/* CYAN DIVIDER LIKE THE LIT CARD */
 .team-info::before {
   content: "";
-  width: 80%;
+  display: block;
+  width: 82%;
   height: 3px;
+  margin: 0 auto 13px;
   background: #55e7f4;
-  margin-bottom: 12px;
-  box-shadow: 0 0 5px #55e7f4;
+  box-shadow: 0 0 6px #55e7f4;
 }
 
-/* BUTTON IS BELOW THE CARD */
-.visit-button {
+/* BUTTON WRAPPER - OUTSIDE/BENEATH CARD */
+.button-wrap {
   position: absolute;
-  z-index: 5;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: -52px;
+  top: calc(100% + 14px);
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+}
+
+/* VISIT TEAM PAGE BUTTON */
+.visit-button {
   display: inline-block;
-  padding: 10px 18px;
+  padding: 11px 20px;
   background: #ff1493;
   color: white;
   text-decoration: none;
-  font-weight: bold;
-  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 900;
+  border-radius: 7px;
   white-space: nowrap;
-}
-
-/* MAKE ROOM FOR BUTTON BELOW CARD */
-.team-card {
-  margin-bottom: 60px;
-  overflow: visible;
-}
-
-/* KEEP IMAGE AND CARD CONTENT CLIPPED */
-.team-card > img {
-  border-radius: 9px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.35);
 }
 
 /* TABLET */
 @media (max-width: 850px) {
   #team-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 18px;
   }
 }
 
@@ -163,14 +180,22 @@ body {
 
   #team-grid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 28px;
   }
 
   .team-card {
     max-width: 390px;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 60px;
+    margin-bottom: 70px;
+  }
+
+  .team-card h2 {
+    font-size: 25px;
+  }
+
+  .team-card p {
+    font-size: 15px;
   }
 }
 
@@ -277,69 +302,82 @@ fetch(sheetURL)
         placeholders[index % placeholders.length];
 
       const card = document.createElement("div");
-      card.className = "team-card";
+card.className = "team-card";
 
-      const img = document.createElement("img");
-      img.src = isURL(logo) ? logo.trim() : placeholder;
-      img.className = "team-logo";
-      img.alt = team + " logo";
+const img = document.createElement("img");
+img.src = isURL(logo) ? logo.trim() : placeholder;
+img.className = "team-logo";
+img.alt = team + " background";
 
-      img.onerror = () => {
-        img.onerror = null;
-        img.src = placeholder;
-      };
+img.onerror = () => {
+  img.onerror = null;
+  img.src = placeholder;
+};
 
-      card.appendChild(img);
-      card.classList.add("baseball-card");
+card.appendChild(img);
+card.classList.add("baseball-card");
 
-      const info = document.createElement("div");
-      info.className = "team-info";
+/* TEAM INFORMATION ON TOP OF THE PHOTO */
+const info = document.createElement("div");
+info.className = "team-info";
 
-      const name = document.createElement("h2");
-      name.textContent = team;
-      info.appendChild(name);
+/* TEAM NAME */
+const name = document.createElement("h2");
+name.textContent = team;
+info.appendChild(name);
 
-      if (town) {
-        const p = document.createElement("p");
-        p.textContent = town;
-        info.appendChild(p);
-      }
+/* TOWN */
+if (town) {
+  const p = document.createElement("p");
+  p.textContent = town;
+  info.appendChild(p);
+}
 
-      if (ages) {
-        const p = document.createElement("p");
-        p.textContent = ages;
-        info.appendChild(p);
-      }
+/* AGES */
+if (ages) {
+  const p = document.createElement("p");
+  p.textContent = ages;
+  info.appendChild(p);
+}
 
-      if (type) {
-        const p = document.createElement("p");
-        p.textContent = type;
-        info.appendChild(p);
-      }
+/* TEAM TYPE */
+if (type) {
+  const p = document.createElement("p");
+  p.textContent = type;
+  info.appendChild(p);
+}
 
-      let link = "";
+card.appendChild(info);
 
-      if (isURL(website)) {
-        link = website.trim();
-      } else if (isURL(social)) {
-        link = social.trim();
-      }
+/* TEAM LINK */
+let link = "";
 
-      if (link) {
-        const button = document.createElement("a");
-        button.className = "visit-button";
-        button.href = link;
-        button.target = "_blank";
-        button.rel = "noopener noreferrer";
-        button.textContent =
-          isURL(website) ? "Visit Team Page" : "Visit Team Page";
+if (isURL(website)) {
+  link = website.trim();
+} else if (isURL(social)) {
+  link = social.trim();
+}
 
-        info.appendChild(button);
-      }
+/* BUTTON BELOW CARD */
+if (link) {
+  const button = document.createElement("a");
+  button.className = "visit-button";
+  button.href = link;
+  button.target = "_blank";
+  button.rel = "noopener noreferrer";
+  button.textContent = "Visit Team Page";
 
-      card.appendChild(info);
-      grid.appendChild(card);
-    });
+  const buttonWrap = document.createElement("div");
+  buttonWrap.className = "button-wrap";
+  buttonWrap.appendChild(button);
+
+  card.appendChild(buttonWrap);
+}
+
+grid.appendChild(card);
+});
+
+     
 
     status.style.display = "none";
 
