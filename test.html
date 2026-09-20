@@ -1,0 +1,416 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>YS1 Team Directory</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: #111111;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+#status {
+  text-align: center;
+  padding: 30px;
+  font-size: 18px;
+}
+
+/* DIRECTORY */
+#team-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+
+ /* ==============================
+   YS1 BASEBALL CARD DIRECTORY
+   ============================== */
+
+#team-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 30px 22px;
+  align-items: start;
+}
+
+/* ENTIRE TEAM ENTRY */
+.team-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 4px solid #55e7f4;
+  border-radius: 12px;
+  background: #071426;
+  box-shadow:
+    0 0 9px rgba(85,231,244,.70),
+    inset 0 0 0 2px #ff1493;
+  overflow: visible;
+  margin-bottom: 70px;
+}
+
+/* BASEBALL PHOTO */
+.team-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+}
+
+ .team-logo-overlay {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    z-index: 5;
+}
+
+
+/* DARK GRADIENT OVER LOWER PHOTO */
+.team-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(
+    to bottom,
+    rgba(7,20,38,0) 0%,
+    rgba(7,20,38,0) 45%,
+    rgba(7,20,38,.25) 58%,
+    rgba(7,20,38,.90) 78%,
+    #071426 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* TEAM INFORMATION ON THE CARD */
+.team-info {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 22px;
+  z-index: 3;
+  text-align: center;
+  color: white;
+}
+
+/* TEAM NAME */
+.team-card h2 {
+  color: white;
+  font-size: 27px;
+  line-height: 1.05;
+  margin: 0 0 13px;
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: .5px;
+  text-shadow:
+    0 2px 4px #000,
+    0 0 8px #000;
+}
+
+/* CYAN LINE DIRECTLY BELOW TEAM NAME */
+.team-card h2::after {
+  content: "";
+  display: block;
+  width: 82%;
+  height: 3px;
+  margin: 8px auto 10px;
+  background: #55e7f4;
+  box-shadow: 0 0 6px #55e7f4;
+}
+
+/* TOWN / AGES / TEAM TYPE */
+.team-card p {
+  color: white;
+  margin: 4px 0;
+  font-size: 16px;
+  line-height: 1.15;
+  font-weight: 800;
+  text-shadow:
+    0 2px 4px #000,
+    0 0 6px #000;
+}
+
+/* BUTTON WRAPPER - OUTSIDE/BENEATH CARD */
+.button-wrap {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+}
+
+/* VISIT TEAM PAGE BUTTON */
+.visit-button {
+  display: inline-block;
+  padding: 11px 20px;
+  background: #ff1493;
+  color: white;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 900;
+  border-radius: 7px;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(0,0,0,.35);
+}
+
+/* TABLET */
+@media (max-width: 850px) {
+  #team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 18px;
+  }
+}
+
+/* PHONE */
+@media (max-width: 550px) {
+  body {
+    padding: 12px;
+  }
+
+  #team-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .team-card {
+    max-width: 390px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 70px;
+  }
+
+  .team-card h2 {
+    font-size: 25px;
+  }
+
+  .team-card p {
+    font-size: 15px;
+  }
+}
+
+ 
+</style>
+</head>
+
+<body>
+
+<div id="status">Loading Monmouth County teams...</div>
+<div id="team-grid"></div>
+
+<script>
+
+const sheetURL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTqzTH1FxtERL_H4OC9trts5bdXCHDtK3k4BRlI_oR20Xcsv78ychhbPPTrShFd_UsIey_zC7bL1Jk-/pub?gid=372911082&single=true&output=csv";
+
+const placeholders = [
+  "images/card01.png",
+  "images/baseball-placeholder-2.png",
+  "images/baseball-placeholder-3.png",
+  "images/baseball-placeholder-4.png",
+  "images/baseball-placeholder-5.png",
+  "images/baseball-placeholder-6.png",
+  "images/baseball-placeholder-7.png",
+  "images/baseball-placeholder-8.png",
+  "images/baseball-placeholder-9.png",
+  "images/baseball-placeholder-10.png"
+];
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && quoted && next === '"') {
+      cell += '"';
+      i++;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(cell);
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") i++;
+
+      row.push(cell);
+
+      if (row.some(value => value.trim() !== "")) {
+        rows.push(row);
+      }
+
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+
+  if (cell.length || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+function isURL(value) {
+  return /^https?:\/\//i.test((value || "").trim());
+}
+
+fetch(sheetURL)
+  .then(response => {
+    if (!response.ok) throw new Error("Could not load database.");
+    return response.text();
+  })
+
+  .then(text => {
+
+    const rows = parseCSV(text);
+    const teams = rows.slice(1);
+
+    const grid = document.getElementById("team-grid");
+    const status = document.getElementById("status");
+
+    teams.forEach((row, index) => {
+
+      const team = row[0] || "";
+      const town = row[1] || "";
+      const type = row[2] || "";
+      const ages = row[3] || "";
+      const website = row[4] || "";
+      const social = row[5] || "";
+      const logo = row[12] || "";
+
+      if (!team.trim()) return;
+
+      const placeholder =
+        placeholders[index % placeholders.length];
+
+      const card = document.createElement("div");
+card.className = "team-card";
+
+const img = document.createElement("img");
+img.src = isURL(logo) ? logo.trim() : placeholder;
+img.className = "team-logo";
+img.alt = team + " background";
+
+img.onerror = () => {
+  img.onerror = null;
+  img.src = placeholder;
+};
+
+card.appendChild(img);
+
+     /* TEAM LOGO */
+if (logo) {
+  const logoImg = document.createElement("img");
+  logoImg.className = "team-logo-overlay";
+  logoImg.src = logo.trim();
+  logoImg.alt = team + " logo";
+  card.appendChild(logoImg);
+}
+     
+card.classList.add("baseball-card");
+
+/* TEAM INFORMATION ON TOP OF THE PHOTO */
+const info = document.createElement("div");
+info.className = "team-info";
+
+/* TEAM NAME */
+const name = document.createElement("h2");
+name.textContent = team;
+info.appendChild(name);
+
+/* TOWN */
+if (town) {
+  const p = document.createElement("p");
+  p.textContent = town +", New Jersey";
+  info.appendChild(p);
+}
+
+/* AGES */
+if (ages) {
+  const p = document.createElement("p");
+  p.textContent = ages;
+  info.appendChild(p);
+}
+
+/* TEAM TYPE */
+if (type) {
+  const p = document.createElement("p");
+  p.textContent = type;
+  info.appendChild(p);
+}
+
+card.appendChild(info);
+
+/* TEAM LINK */
+let link = "";
+
+if (isURL(website)) {
+  link = website.trim();
+} else if (isURL(social)) {
+  link = social.trim();
+}
+
+/* BUTTON BELOW CARD */
+if (link) {
+  const button = document.createElement("a");
+  button.className = "visit-button";
+  button.href = link;
+  button.target = "_blank";
+  button.rel = "noopener noreferrer";
+  button.textContent = "Visit Team Page";
+
+  const buttonWrap = document.createElement("div");
+  buttonWrap.className = "button-wrap";
+  buttonWrap.appendChild(button);
+
+  card.appendChild(buttonWrap);
+}
+
+grid.appendChild(card);
+});
+
+     
+
+    status.style.display = "none";
+
+  })
+
+  .catch(error => {
+    document.getElementById("status").textContent =
+      "Unable to load team directory.";
+    console.error(error);
+  });
+
+</script>
+
+</body>
+</html>
